@@ -1,11 +1,11 @@
 import math
 
 def square_eq_solver(a, b, c):
-    if a == 0 and b == 0 and c == 0:
+    if math.isclose(a, 0)and math.isclose(b, 0) and math.isclose(c, 0):
         print('any x is a solution')
         return
-    if a == 0:
-        if b != 0:
+    if math.isclose(a, 0):
+        if not math.isclose(b, 0):
             return (-c / b)
         else:
             print(f'incorrect input data: {c} != 0')
@@ -13,7 +13,7 @@ def square_eq_solver(a, b, c):
     discr = b ** 2 - 4 * a * c
     if discr < 0:
         return None
-    elif discr == 0:
+    elif math.isclose(discr, 0):
         return (-b / (2 * a), -b / (2 * a))
     else:
         return ((-b + discr ** 0.5) / (2 * a), (-b - discr ** 0.5) / (2 * a))
