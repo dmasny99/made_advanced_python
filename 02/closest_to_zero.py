@@ -1,4 +1,3 @@
-from cmath import isclose
 import math
 
 def get_closest_to_zero(nums):
