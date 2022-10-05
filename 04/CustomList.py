@@ -1,5 +1,4 @@
 class CustomList(list):
-
     def __init__(self, *args):
         list.__init__(self, *args)
 
@@ -14,9 +13,17 @@ class CustomList(list):
                 cl.append(longest_list[i])
         return cl
 
+    def __radd__(self, lst):
+        return self.__add__(lst)
+    
     def __sub__(self, lst):
         lst = [-elem for elem in lst]
-        return CustomList.__add__(self, lst)
+        return self.__add__(lst)
+    
+    def __rsub__(self, lst):
+        # возможно коряво, по-другому не додумался 
+        self = CustomList([-elem for elem in self])
+        return self.__add__(lst)
     
     def __eq__(self, lst):
         return sum(self) == sum(lst)
@@ -36,15 +43,13 @@ class CustomList(list):
     def __gt__(self, lst):
         return True if sum(self) > sum(lst) else False
 
-if __name__ == '__main__':
-   print(CustomList([1, 2, 3, 4, 5]) + CustomList([1, 2, 3]))
-   print(CustomList([1, 2, 3]) - CustomList([1, 2, 3, 4, 5]))
-   print(CustomList([1, 2, 3]) == CustomList([6]))
-   print(CustomList([1, 2, 3]) > CustomList([5]))
-   print(CustomList([1, 2, 3]) >= CustomList([6]))
-   print(CustomList([1, 2, 3]) < CustomList([9]))
-   print(CustomList([1, 2, 3]) <= CustomList([6]))
-   # TODO add summation with List
-   # TODO add tests in a separated file
-
+    def __str__(self):
+        summ = 0
+        string = ''
+        for elem in self:
+            string += f'{elem} '
+            summ += float(elem) # в предположении, что могут быть только числа (не обязательно целые)
+        string += f'sum is {summ}'
+        return string 
+    
 
