@@ -22,8 +22,8 @@ class CustomList(list):
     
     def __rsub__(self, lst):
         # возможно коряво, по-другому не додумался 
-        self = CustomList([-elem for elem in self])
-        return self.__add__(lst)
+        tmp = CustomList([-elem for elem in self])
+        return tmp.__add__(lst)
     
     def __eq__(self, lst):
         return sum(self) == sum(lst)
