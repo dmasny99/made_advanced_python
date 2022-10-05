@@ -1,3 +1,4 @@
+from email.utils import collapse_rfc2231_value
 from CustomList import CustomList
 
 if __name__ == '__main__':
@@ -21,8 +22,10 @@ if __name__ == '__main__':
     for idx, elem in enumerate(tmp):
         assert elem == res[idx]
     ### проверка на создание нового объекта
-    tmp = CustomList([1, 2, 3, 4, 5]) + CustomList([1, 2, 3])
-    assert (id(CustomList([1, 2, 3, 4, 5])) != id(tmp)) and (id(CustomList([1, 2, 3])) != id(tmp))
+    cl1 = CustomList([1, 2, 3, 4, 5])
+    cl2 = CustomList([1, 2, 3])
+    tmp = cl1 + cl2
+    assert (id(cl1) != id(tmp)) and (id(cl2) != id(tmp))
     #проверка на работу с обычным списком
     ## на правильность расчета элементов
     tmp = [1, 2, 3] - CustomList([3, 3, 3, 3])
@@ -45,7 +48,9 @@ if __name__ == '__main__':
     for idx, elem in enumerate(tmp):
         assert elem == res[idx]
     ## на то, что создается новый объект
-    tmp = CustomList([3, 3]) - [1, 2, 3]
-    assert (id(CustomList[3, 3]) != id(tmp)) and (id([1, 2, 3]) != id(tmp))
+    cl1 = CustomList([3, 3])
+    l2 = [1, 2, 3]
+    tmp = cl1 - l2
+    assert (id(cl1) != id(tmp)) and (id(l2) != id(tmp))
     # проверка, что исходные объекты не меняются не делал, тк логика сложения 
     # построена не на добивке нулями
