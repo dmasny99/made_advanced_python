@@ -1,7 +1,5 @@
 class CustomList(list):
-    def __init__(self, *args):
-        list.__init__(self, *args)
-
+    
     def __add__(self, lst):
         cl = CustomList()
         longest_list = self if len(self) > len(lst)  else lst
