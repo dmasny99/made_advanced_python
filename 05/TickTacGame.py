@@ -1,3 +1,6 @@
+from re import X
+
+
 class TickTacGame:
     def __init__(self):
         self.board = [['.', '.', '.'],
@@ -42,7 +45,7 @@ class TickTacGame:
                     # TODO проверка на ничью
                     # self.check_draw()
                     print(f'Winner is {row[0]}')
-                    
+
         for column in range(3):
             if self.board[0][column] == self.board[1][column] \
                 and self.board[1][column] == self.board[2][column]:
@@ -52,9 +55,31 @@ class TickTacGame:
                     # TODO проверка на ничью
                     # self.check_draw()
                     print(f'Winner is {self.board[0][column]}')
-    
+
+        if self.board[0][0] == self.board[1][1] and  self.board[1][1] == self.board[2][2]:
+            if self.board[0][0] == '.':
+                return
+            else:
+                    # если победа по диагонали, то точно нет ничьей
+                    print(f'Winner is {self.board[0][0]}')
+
+        if self.board[2][0] == self.board[1][1] and  self.board[1][1] == self.board[0][2]:
+            if self.board[2][0] == '.':
+                return
+            else:
+                    # если победа по диагонали, то точно нет ничьей
+                    print(f'Winner is {self.board[2][0]}')
+            
     def check_draw(self):
-        pass
+        x_counter = 0
+        o_counter = 0
+        for row in self.board:
+            for elem in row:
+                if elem == 'X':
+                    x_counter += 1
+                elif elem == '0':
+                    o_counter += 1
+
 
 if __name__ == '__main__':
     game = TickTacGame()
