@@ -30,11 +30,14 @@ class TickTacGame:
         if self.board[x][y] == '.': # если поле свободно
             self.board[x][y] = elem
             self.last_elem = elem
-            self.check_winner() # проверка выигрыша
+            self.check_winner() 
+            self.check_draw()
         else:
             print(f'This cell is already filled by {self.board[x][y]}, try another one!')
     def clear_board(self):
-        self.__init__()
+        self.board = [['.', '.', '.'],
+                      ['.', '.', '.'],
+                      ['.', '.', '.']]
 
     def check_winner(self):
         for row in self.board:
@@ -42,8 +45,6 @@ class TickTacGame:
                 if row[0] == '.':
                     return
                 else:
-                    # TODO проверка на ничью
-                    # self.check_draw()
                     print(f'Winner is {row[0]}')
 
         for column in range(3):
@@ -52,8 +53,6 @@ class TickTacGame:
                 if self.board[0][column] == '.':
                     return
                 else:
-                    # TODO проверка на ничью
-                    # self.check_draw()
                     print(f'Winner is {self.board[0][column]}')
 
         if self.board[0][0] == self.board[1][1] and  self.board[1][1] == self.board[2][2]:
@@ -71,14 +70,13 @@ class TickTacGame:
                     print(f'Winner is {self.board[2][0]}')
             
     def check_draw(self):
-        x_counter = 0
-        o_counter = 0
+        dot_counter = 0
         for row in self.board:
             for elem in row:
-                if elem == 'X':
-                    x_counter += 1
-                elif elem == '0':
-                    o_counter += 1
+                if elem == '.':
+                    dot_counter += 1
+        if dot_counter == 0:
+            print('It is draw')
 
 
 if __name__ == '__main__':

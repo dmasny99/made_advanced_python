@@ -30,16 +30,16 @@ class CustomList(list):
         return sum(self) != sum(lst)
 
     def __le__(self, lst):
-        return True if sum(self) <= sum(lst) else False
+        return sum(self) <= sum(lst) 
     
     def __lt__(self, lst):
-        return True if sum(self) < sum(lst) else False
+        return sum(self) < sum(lst) 
 
     def __ge__(self, lst):
-        return True if sum(self) >= sum(lst) else False
+        return sum(self) >= sum(lst) 
     
     def __gt__(self, lst):
-        return True if sum(self) > sum(lst) else False
+        return sum(self) > sum(lst) 
 
     def __str__(self):
         summ = 0
