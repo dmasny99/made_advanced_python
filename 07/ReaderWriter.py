@@ -16,45 +16,40 @@ class BaseWriter(ABC):
 
 class TxtReader(BaseReader):
     def read(self, fileobj):
-        with open(fileobj, 'r') as f:
-            data = f.read().splitlines()
-        return data
+        return fileobj.read().splitlines()
 
 class TxtWriter(BaseWriter):
     def dump(self, fileobj, data):
-        with open(fileobj, 'a') as f:
-            f.writelines(data)
+        fileobj.writelines(data)
 
 class CsvReader(BaseReader):
     def read(self, fileobj):
         data = []
-        with open(fileobj, 'r') as f:
-            csvreader = csv.reader(f)
-            for row in csvreader:
-                data.append(','.join([elem for elem in row]))
+        csvreader = csv.reader(fileobj)
+        for row in csvreader:
+            data.append(','.join([elem for elem in row]))
         return data
     
 class CsvWriter(BaseWriter):
     def dump(self, fileobj, data):
-        with open(fileobj, 'a') as f:
-            csvwriter = csv.writer(f, delimiter = ',')
+            csvwriter = csv.writer(fileobj, delimiter = ',')
             csvwriter.writerow(data)
 
 class JsonReader(BaseReader):
     def read(self, fileobj):
-        with open(fileobj, 'r') as f:
-            return json.load(f)
+        return json.load(fileobj)
 
 class JsonWriter(BaseWriter):
     def dump(self, fileobj, data):
-        with open(fileobj, 'a') as f:
-            json.dump(data, f)
+        json.dump(data, fileobj)
 
 def read_data(fileobj, reader: BaseReader):
-    return reader.read(fileobj)
+    with open(fileobj, 'r') as f:
+        return reader.read(f)
 
 def dump_data(data, fileobj, writer: BaseWriter):
-    writer.dump(fileobj, data)
+    with open(fileobj, 'w') as f:
+        writer.dump(f, data)
 
 if __name__ == '__main__':
     print(read_data('tt.txt', reader = TxtReader()))
