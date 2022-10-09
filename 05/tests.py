@@ -48,3 +48,129 @@ class TestGame(unittest.TestCase):
             game.last_elem = '0'
             with self.assertRaises(CustomExceptions.WrongStepOrderException):
                 game.input_validation()
+    
+    # тест на ход (что доска поменялась)
+    def test_board_step(self):
+        game = TickTacGame()
+        valid_board = [['X', '.', '.'],
+                       ['.', '.', '.'],
+                       ['.', '.', '.']]
+        game.fill_cell('X', '0', '0')
+        self.assertEqual(game.board, valid_board)
+
+        game = TickTacGame()
+        valid_board = [['X', '0', '.'],
+                       ['.', '.', '.'],
+                       ['.', '.', '.']]
+        game.fill_cell('X', '0', '0')
+        game.fill_cell('0', '0', '1')
+        self.assertEqual(game.board, valid_board)
+
+        game = TickTacGame()
+        valid_board = [['X', '0', '.'],
+                       ['.', 'X', '.'],
+                       ['.', '.', '0']]
+        game.fill_cell('X', '0', '0')
+        game.fill_cell('0', '0', '1')
+        game.fill_cell('X', '1', '1')
+        game.fill_cell('0', '2', '2')
+        self.assertEqual(game.board, valid_board)  
+    #проверки на победу
+    def test_win(self):
+        # вертикально для Х
+        game = TickTacGame()
+        game.board = [['X', '0', '.'],
+                      ['X', '.', '0'],
+                      ['X', '.', '.']]
+        self.assertEqual(game.check_winner(), 'X')
+
+        game.board = [['0', 'X', '.'],
+                      ['.', 'X', '0'],
+                      ['.', 'X', '.']]
+        self.assertEqual(game.check_winner(), 'X')
+
+        game.board = [['.', '.', 'X'],
+                      ['.', '0', 'X'],
+                      ['0', '.', 'X']]
+        self.assertEqual(game.check_winner(), 'X')
+        # вертикально для 0
+        game.board = [['0', 'X', '.'],
+                      ['0', '.', 'X'],
+                      ['0', '.', '.']]
+        self.assertEqual(game.check_winner(), '0')
+
+        game.board = [['X', '0', '.'],
+                      ['.', '0', 'X'],
+                      ['.', '0', '.']]
+        self.assertEqual(game.check_winner(), '0')
+
+        game.board = [['.', '.', '0'],
+                      ['.', 'X', '0'],
+                      ['X', '.', '0']]
+        self.assertEqual(game.check_winner(), '0')
+        # горизонтально для X
+        game.board = [['X', 'X', 'X'],
+                      ['0', '.', '0'],
+                      ['.', '.', '.']]
+        self.assertEqual(game.check_winner(), 'X')
+
+        game.board = [['0', '.', '.'],
+                      ['X', 'X', 'X'],
+                      ['.', '0', '.']]
+        self.assertEqual(game.check_winner(), 'X')
+
+        game.board = [['.', '.', '.'],
+                      ['.', '0', '0'],
+                      ['X', 'X', 'X']]
+        self.assertEqual(game.check_winner(), 'X')
+         # горизонтально для 0
+        game.board = [['0', '0', '0'],
+                      ['X', '.', 'X'],
+                      ['.', '.', '.']]
+        self.assertEqual(game.check_winner(), '0')
+
+        game.board = [['X', '.', '.'],
+                      ['0', '0', '0'],
+                      ['.', 'X', '.']]
+        self.assertEqual(game.check_winner(), '0')
+
+        game.board = [['.', '.', '.'],
+                      ['.', 'X', 'X'],
+                      ['0', '0', '0']]
+        self.assertEqual(game.check_winner(), '0')
+        #диагонали Х
+        game.board = [['X', '.', '.'],
+                      ['.', 'X', '0'],
+                      ['0', '0', 'X']]
+        self.assertEqual(game.check_winner(), 'X')
+
+        game.board = [['0', '.', 'X'],
+                      ['.', 'X', '0'],
+                      ['X', '0', '.']]
+        self.assertEqual(game.check_winner(), 'X')
+        #диагонали 0
+        game.board = [['0', '.', '.'],
+                      ['.', '0', 'X'],
+                      ['X', 'X', '0']]
+        self.assertEqual(game.check_winner(), '0')
+
+        game.board = [['X', '.', '0'],
+                      ['.', '0', 'X'],
+                      ['0', 'X', '.']]
+        self.assertEqual(game.check_winner(), '0')
+
+    #проверка на ничью
+    def test_draw(self):
+        game = TickTacGame()
+        game.board = [['X', '0', '0'],
+                      ['0', 'X', 'X'],
+                      ['0', 'X', '0']]
+        self.assertEqual(game.check_winner(), 'draw')
+
+        game.board = [['0', 'X', 'X'],
+                      ['X', '0', '0'],
+                      ['X', '0', 'X']]
+        self.assertEqual(game.check_winner(), 'draw')
+
+if __name__ == '__main__':
+    unittest.main()
