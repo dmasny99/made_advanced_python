@@ -53,14 +53,4 @@ def read_data(fileobj, reader: BaseReader):
 def dump_data(data, fileobj, writer: BaseWriter):
     writer.dump(fileobj, data)
 
-if __name__ == '__main__':
-    buf = io.StringIO()
-    dump_data(['word1', 'word2', 'word3'], buf, CsvWriter())
-    print(buf.getvalue())
-    buf.seek(0)
-    print(read_data(buf, CsvReader()))
-    dump_data(['word4', 'word5', 'word6'], buf, CsvWriter())
-    print(buf.getvalue())
-    buf.seek(0)
-    print(read_data(buf, CsvReader()))
     
