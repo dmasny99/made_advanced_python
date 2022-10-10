@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 import json
 import csv
-import io
 # насколько я понял, нужно было сделать абстрактный базовый класс
 # а потом в наследниках переопределить методы, но этого вроде не было на 7 лекции
-# поэтому я опирался на этот источник https://docs-python.ru/tutorial/klassy-jazyke-python/abstraktnye-klassy/
+# поэтому я опирался на этот источник 
+# https://docs-python.ru/tutorial/klassy-jazyke-python/abstraktnye-klassy/
 class BaseReader(ABC):
     @abstractmethod
     def read(self):
@@ -52,5 +52,4 @@ def read_data(fileobj, reader: BaseReader):
 
 def dump_data(data, fileobj, writer: BaseWriter):
     writer.dump(fileobj, data)
-
     

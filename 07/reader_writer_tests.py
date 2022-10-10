@@ -1,21 +1,25 @@
 import io
-from ReaderWriter import * # на паре говорили, что так лучше не делать, но и километровую строку писать тоже не хочется
 import unittest
 import json
+from reader_writer import TxtReader, TxtWriter, CsvReader, \
+    CsvWriter, JsonReader, JsonWriter, dump_data, read_data
+
 class ReadwrWriterTest(unittest.TestCase):
     # проверка на запись json
     def test_json_write(self):
         buf = io.StringIO()
         self.assertEqual(buf.getvalue(), '')
         dump_data({'name' : 'Jane', 'age' : 23, 'occupation' : 'teacher'}, buf, JsonWriter())
-        self.assertEqual(buf.getvalue(), json.dumps({'name' : 'Jane', 'age' : 23, 'occupation' : 'teacher'}))
+        self.assertEqual(buf.getvalue(), 
+                        json.dumps({'name' : 'Jane', 'age' : 23, 'occupation' : 'teacher'}))
 
     # проверка на чтение json
     def test_json_read(self):
         buf = io.StringIO()
         self.assertEqual(buf.getvalue(), '')
         dump_data({'name' : 'Jane', 'age' : 23, 'occupation' : 'teacher'}, buf, JsonWriter())
-        self.assertEqual(read_data(buf.getvalue(), JsonReader()), {'name' : 'Jane', 'age' : 23, 'occupation' : 'teacher'})
+        self.assertEqual(read_data(buf.getvalue(), JsonReader()), 
+                        {'name' : 'Jane', 'age' : 23, 'occupation' : 'teacher'})
     
     # проверка на запись txt
     def test_txt_write(self):
