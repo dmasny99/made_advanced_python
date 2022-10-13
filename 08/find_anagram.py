@@ -28,6 +28,4 @@ def find_anagrams(text: str, pattern: str):
 
     return res
 
-if __name__ == '__main__':
-    print(find_anagrams('abab', 'ab'))
     
