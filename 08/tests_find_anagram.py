@@ -16,6 +16,10 @@ class TestFinder(unittest.TestCase):
         text = 'abab'
         self.assertEqual(find_anagrams(text, pattern), [])
 
+        pattern = 'с'
+        text = 'abab'
+        self.assertEqual(find_anagrams(text, pattern), [])
+
         pattern = 'abccccc'
         text = 'abab'
         self.assertEqual(find_anagrams(text, pattern), [])
