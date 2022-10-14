@@ -2,9 +2,7 @@ from collections import defaultdict
 
 def find_anagrams(text: str, pattern: str):
     res = []
-    if pattern == '':
-        return res
-    if len(pattern) > len(text):
+    if pattern == '' or len(pattern) > len(text):
         return res
     pattern_dict = defaultdict(int)
     for el in pattern:
