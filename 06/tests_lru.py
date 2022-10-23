@@ -15,7 +15,6 @@ class LRUTests(unittest.TestCase):
         lru.set(3, 3)
         self.assertEqual(lru.get(2), 2)
         self.assertEqual(lru.get(3), 3)
-        self.set(2,2)
 
     def test_from_task(self):
         lru = LRUCache(2)
@@ -91,6 +90,7 @@ class LRUTests(unittest.TestCase):
         self.assertIsNone(lru.get('k3'))
         self.assertEqual(lru.get('k4'), 'val4')
         self.assertEqual(lru.get('k5'), 'val5')
+
 
 if __name__ == '__main__':
     unittest.main()
