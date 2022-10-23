@@ -4,6 +4,7 @@ from generator import generator
 
 
 class ReadwrWriterTest(unittest.TestCase):
+
     def test_find_lines(self):
         # находит только строки состоящие из одной буквы а
         buf = io.StringIO('a\nbb\nabcd\naaabbb\nab\na')
