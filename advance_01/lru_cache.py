@@ -56,7 +56,3 @@ if __name__ == '__main__':
     lru.get('0')
 
     lru = LRUCache(stdout_logger = args.s, limit = 0)
-
-
-
-
