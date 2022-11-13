@@ -1,12 +1,16 @@
 import socket
+import argparse
 import threading
 import queue
-import requests
-from bs4 import BeautifulSoup
 import json
 import re
+from collections import defaultdict
+import operator
+import requests
+from bs4 import BeautifulSoup
 
-def create_connection(host = '', port = 2222):
+
+def create_connection(host="", port=2222):
     sock_recv = socket.socket()
     sock_recv.bind((host, port))
     sock_recv.listen(1)
@@ -23,60 +27,77 @@ def create_connection(host = '', port = 2222):
 
 def run_master(conn_recv, que):
     while True:
-        urls = conn_recv.recv(4096).decode().split('\n')
+        urls = conn_recv.recv(4096).decode().split("\n")
         for url in urls:
-            if url != '':
+            if url != "":
                 que.put(url)
-                if url == '###':
+                if url == "###":
                     return
 
-def run_worker(que, conn_send, num_processed_urls, k):
+
+def get_k_freq(words, k):
+    words_dict = defaultdict(int)
+    for word in words:
+        words_dict[word] += 1
+    res = dict(sorted(words_dict.items(), key=operator.itemgetter(1), reverse=True)[:k])
+    return res
+
+
+def run_worker(que, conn_send, locker, k):
     while True:
         url = que.get()
-        if url == '###':
-            que.put('###') # dead pill
+        if url == "###":
+            que.put("###")  # dead pill
             conn_send.send(url.encode())
             break
         try:
-            req = requests.get(url)
+            req = requests.get(url, timeout=3)
+            soup = BeautifulSoup(req.text, features="html.parser")
+            words = re.findall(r"[A-Za-z]+", soup.text)
+            freq_dict = get_k_freq(words, k)
+            answ = json.dumps({url: freq_dict})
         except:
-            answ = json.dumps({url: 'error occured'})
-        soup = BeautifulSoup(req.text, features = 'html.parser')
-        words = re.findall(r'[A-Za-z]+', soup.text)
-        unique_words = dict(zip(words, [words.count(i) for i in words]))
-        res = sorted(unique_words.items(), key=lambda x: -x[1])[:k]
-        answ = json.dumps({url: {item[0]: item[1] for item in res}})
+            answ = json.dumps({url: "error"})
         conn_send.send(answ.encode())
 
-        n_urls = num_processed_urls.get() + 1
-        num_processed_urls.put(n_urls)
-        print(f'Processed urls: {n_urls}')
+        global urls_cnt
+        with locker:
+            urls_cnt += 1
+            print(f"Processed urls: {urls_cnt}")
 
 
-def start_server(w = 3, k = 10):
+def start_server(worker_threads, k):
     que = queue.Queue()
-    num_processed_urls = queue.Queue()
-    num_processed_urls.put(0)
+    locker = threading.Lock()
 
     conn_recv, conn_send, sock_recv, sock_send = create_connection()
 
-    master_thread = threading.Thread(target = run_master, args=(conn_recv, que))
-    worker_threads = [threading.Thread(target=run_worker, 
-                                       args=(que, conn_send, num_processed_urls, k)) for _ in range(w)]
+    master_thread = threading.Thread(target=run_master, args=(conn_recv, que))
+    worker_threads = [
+        threading.Thread(target=run_worker, args=(que, conn_send, locker, k))
+        for _ in range(worker_threads)
+    ]
 
-    for th in worker_threads:
-        th.start()
+    for thread in worker_threads:
+        thread.start()
 
     master_thread.start()
 
-    for th in worker_threads:
-        th.join()
+    for thread in worker_threads:
+        thread.join()
+
     master_thread.join()
-    
+
     sock_recv.close()
     sock_send.close()
-    print('===Connection closed===')
+    print("===Connection closed===")
 
-if __name__ == '__main__':
-    ## TODO add cmd line parser
-    start_server()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-w", type=str, required=True)
+    parser.add_argument("-k", type=str, required=True)
+    args = parser.parse_args()
+
+    urls_cnt = 0
+    start_server(int(args.w), int(args.k))

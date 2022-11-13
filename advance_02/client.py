@@ -1,9 +1,13 @@
 import socket
 import queue
 import threading
+import argparse
 
-def send_url(url_que, stop_client_que, sock_send, sock_recv):
+def send_url(url_que, locker, sock_send, sock_recv):
+    global stop_cnt
     while True:
+        if stop_cnt <= 1:
+            break
         # to avoid broken pipe error 
         try:
             url = url_que.get()
@@ -16,11 +20,10 @@ def send_url(url_que, stop_client_que, sock_send, sock_recv):
         # to avoid broken pipe error 
         try:
             answ = sock_recv.recv(4096).decode()
-            if stop_client_que.empty():
-                break
-            stop_client_que.get()
-            if answ not in ['', '###']:
+            if answ != '' and '#' not in answ:
                 print(answ)
+                with locker:
+                    stop_cnt -= 1
         except: # crutchy code, did't find another solution
             pass
 
@@ -36,31 +39,41 @@ def create_sockets(addres = '', port = 2222):
 
     return sock_send, sock_recv
 
-def start_client(thread_num = 5, url_path = 'urls.txt'):
+def read_txt(path):
+    with open(path, 'r') as file:
+        urls = file.readlines()
+    return urls, len(urls) - 1
+    
+
+def start_client(thread_num, urls):
 
     url_que = queue.Queue() 
-    stop_client_que = queue.Queue()
+    locker = threading.Lock()
+
     sock_send, sock_recv = create_sockets()
-    with open(url_path, 'r') as f:
-        urls = f.readlines()
+
     for url in urls:
         url_que.put(url)
-        stop_client_que.put(1) # will be used as a flag for a connection close
 
-    threads = [threading.Thread(target = send_url, args=(url_que, stop_client_que, sock_send, sock_recv))\
+    threads = [threading.Thread(target = send_url, args=(url_que, locker, sock_send, sock_recv))\
         for _ in range(thread_num)]
     
-    for th in threads:
-        th.start()
+    for thread in threads:
+        thread.start()
     
-    for th in threads:
-        th.join()
+    for thread in threads:
+        thread.join()
 
     sock_send.close()
     sock_recv.close()
     print('===Connection closed===')
 
 if __name__ == '__main__':
-    #TODO add cmd line parser
-    start_client()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('positionals', nargs='+')
+    args = parser.parse_args()
+
+    urls, stop_cnt = read_txt(args.positionals[1])
+
+    start_client(int(args.positionals[0]), urls)
     
