@@ -4,12 +4,20 @@ import multiprocessing
 import server
 import client
 import sys
-import os
 import time
+import logging
+import contextlib
 
 # I tried to do it with subprocess and failed
 # https://stackoverflow.com/questions/52435965/what-is-the-difference-between-os-devnull-and-subprocess-pipe
 # so I decided to use os.devnull and multiprocessing
+
+logger = logging.getLogger("Train")
+handler = logging.FileHandler("logs.log")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(handler)
 
 
 class ClientServerTest(unittest.TestCase):
@@ -20,14 +28,12 @@ class ClientServerTest(unittest.TestCase):
         client_threads=None,
         urls_path=None,
     ):
-        with open(os.devnull, "w") as null:
-            out = sys.stdout
-            sys.stdout = null
+        with contextlib.redirect_stdout(None):
             if type == "server":
                 server.start_server(work_threads, k)
+                # logger.debug("get in server null func")
             elif type == "client":
                 client.start_client(client_threads, urls_path)
-            sys.stdout = out
 
     def get_data_from_stdout(
         type=None,
@@ -42,11 +48,9 @@ class ClientServerTest(unittest.TestCase):
         sys.stdout = tmp_stdout
         if type == "server":
             server.start_server(work_threads, k)
-            que.put(tmp_stdout.readlines())
-
         elif type == "client":
             client.start_client(client_threads, urls_path)
-        que.put(tmp_stdout.readlines())
+        que.put(tmp_stdout.getvalue())
         sys.stdout = stdout
         tmp_stdout.close()
 
