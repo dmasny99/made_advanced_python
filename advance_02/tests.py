@@ -46,10 +46,8 @@ class ClientServerTest(unittest.TestCase):
 
         elif type == "client":
             client.start_client(client_threads, urls_path)
-        # tmp = tmp_stdout.getvalue()
         que.put(tmp_stdout.readlines())
         sys.stdout = stdout
-        # print(tmp_stdout)
         tmp_stdout.close()
 
     def test_correct_response_on_client(self):
@@ -68,36 +66,12 @@ class ClientServerTest(unittest.TestCase):
             },
         )
 
-        # proc_1.start()
         server_proc.start()
         time.sleep(1)
         client_proc.start()
 
         server_proc.join()
         client_proc.join()
-
-        # answ1 = (
-        #     '{"https://en.wikipedia.org/wiki/Main_Page": '
-        #     '{"the": 50, "of": 39, "a": 25, "in": 22, '
-        #     '"and": 21, "Wikipedia": 15, "that": 13}}'
-        # )
-        # answ2 = (
-        #     '{"https://www.open.ru/": '
-        #     '{"и": 44, "Открытие": 15, "в": 11, "на": 10, '
-        #     '"Банк": 9, "по": 9, "Узнать": 8}}'
-        # )
-        # answ3 = (
-        #     '{"https://www.msu.ru/": '
-        #     '{"и": 58, "мая": 48, "в": 47, "МГУ": 46, '
-        #     '"по": 38, "Универсиада": 32, "Ломоносов": 28}}'
-        # )
-        # answ4 = (
-        #     '{"https://cs.msu.ru/": '
-        #     '{"МГУ": 10, "по": 9, "мая": 7, "апреля": 6, '
-        #     '"с": 6, "ВМК": 5, "и": 5}}'
-        # )
-
-        # results = sorted([s for s in queue.get().split("\n") if s])
         results = [s for s in que.get() if s]
         print(*results)
 
