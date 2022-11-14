@@ -3,10 +3,12 @@ import queue
 import threading
 import argparse
 
+STOP_CNT = 0
+
 def send_url(url_que, locker, sock_send, sock_recv):
-    global stop_cnt
+    global STOP_CNT
     while True:
-        if stop_cnt <= 1:
+        if STOP_CNT <= 1:
             break
         # to avoid broken pipe error 
         try:
@@ -23,7 +25,7 @@ def send_url(url_que, locker, sock_send, sock_recv):
             if answ != '' and '#' not in answ:
                 print(answ)
                 with locker:
-                    stop_cnt -= 1
+                    STOP_CNT -= 1
         except: # crutchy code, did't find another solution
             pass
 
@@ -45,7 +47,12 @@ def read_txt(path):
     return urls, len(urls) - 1
     
 
-def start_client(thread_num, urls):
+def start_client(thread_num, path):
+
+    urls, len_urls = read_txt(path)
+    global STOP_CNT
+    STOP_CNT = len_urls
+
 
     url_que = queue.Queue() 
     locker = threading.Lock()
@@ -73,7 +80,8 @@ if __name__ == '__main__':
     parser.add_argument('positionals', nargs='+')
     args = parser.parse_args()
 
-    urls, stop_cnt = read_txt(args.positionals[1])
-
-    start_client(int(args.positionals[0]), urls)
+    path = args.positionals[1]
+    thread_num = int(args.positionals[0])
+    
+    start_client(thread_num, path)
     

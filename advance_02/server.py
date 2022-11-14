@@ -9,6 +9,8 @@ import operator
 import requests
 from bs4 import BeautifulSoup
 
+URLS_CNT = 0
+
 
 def create_connection(host="", port=2222):
     sock_recv = socket.socket()
@@ -44,6 +46,7 @@ def get_k_freq(words, k):
 
 
 def run_worker(que, conn_send, locker, k):
+    global URLS_CNT
     while True:
         url = que.get()
         if url == "###":
@@ -51,6 +54,9 @@ def run_worker(que, conn_send, locker, k):
             conn_send.send(url.encode())
             break
         try:
+            clenaed_url = url.replace("#", "")
+            if clenaed_url != "":
+                url = clenaed_url
             req = requests.get(url, timeout=3)
             soup = BeautifulSoup(req.text, features="html.parser")
             words = re.findall(r"[A-Za-z]+", soup.text)
@@ -58,12 +64,13 @@ def run_worker(que, conn_send, locker, k):
             answ = json.dumps({url: freq_dict})
         except:
             answ = json.dumps({url: "error"})
-        conn_send.send(answ.encode())
-
-        global urls_cnt
-        with locker:
-            urls_cnt += 1
-            print(f"Processed urls: {urls_cnt}")
+        finally:
+            conn_send.send(answ.encode())
+            print(answ)
+            with locker:
+                if "#" not in answ:
+                    URLS_CNT += 1
+                    print(f"Processed urls: {URLS_CNT}")
 
 
 def start_server(worker_threads, k):
@@ -99,5 +106,7 @@ if __name__ == "__main__":
     parser.add_argument("-k", type=str, required=True)
     args = parser.parse_args()
 
-    urls_cnt = 0
-    start_server(int(args.w), int(args.k))
+    worker_threads = int(args.w)
+    k = int(args.k)
+
+    start_server(worker_threads, k)
