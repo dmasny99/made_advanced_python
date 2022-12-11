@@ -1,7 +1,7 @@
-2022-10-31 18:44:14,464	INFO	file_logger	LRU Cache object created
-2022-10-31 18:44:14,464	INFO	file_logger	key: 1, value: hello are added
-2022-10-31 18:44:14,464	INFO	file_logger	key: 2, value: world are added
-2022-10-31 18:44:14,464	INFO	file_logger	key: test, value: case are added
-2022-10-31 18:44:14,464	WARNING	file_logger	0 is not in keys
-2022-10-31 18:44:14,464	INFO	file_logger	LRU Cache object created
-2022-10-31 18:44:14,464	CRITICAL	file_logger	LRU Cache capacity = 0 !
+2022-12-11 21:57:59,196	INFO	file_and_stream_logger	LRU Cache object created
+2022-12-11 21:57:59,196	INFO	file_and_stream_logger	key: 1, value: hello are added
+2022-12-11 21:57:59,196	INFO	file_and_stream_logger	key: 2, value: world are added
+2022-12-11 21:57:59,196	INFO	file_and_stream_logger	key: test, value: case are added
+2022-12-11 21:57:59,196	WARNING	file_and_stream_logger	0 is not in keys
+2022-12-11 21:57:59,196	INFO	file_and_stream_logger	LRU Cache object created
+2022-12-11 21:57:59,196	CRITICAL	file_and_stream_logger	LRU Cache capacity = 0 !

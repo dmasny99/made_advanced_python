@@ -4,8 +4,11 @@
 log_conf = {
     'version': 1,
     'formatters': {
-        'base': {
+        'file': {
             'format': '%(asctime)s\t%(levelname)s\t%(name)s\t%(message)s',
+        },
+        'stream': {
+            'format': '%(levelname)s\t%(name)s\t%(message)s',
         },
     },
     'handlers': {
@@ -13,13 +16,13 @@ log_conf = {
             'class': 'logging.FileHandler',
             'level': 'INFO',
             'filename': 'cache.log',
-            'formatter': 'base',
+            'formatter': 'file',
 
         },
         'stream_handler': {
             'class': 'logging.StreamHandler',
             'level': 'INFO',
-            'formatter': 'base',
+            'formatter': 'stream',
         },
     },
     'loggers': {
