@@ -9,7 +9,7 @@ class SomeModel:
         for word in words:
             num_chars += len(word)
 
-        res = SomeModel.BASE_CONST - num_words / num_chars
+        res = SomeModel.BASE_CONST - num_words / max(num_chars, 1)
         # clipping
         res = max(0, res)
         return res
@@ -18,4 +18,8 @@ class SomeModel:
 if __name__ == "__main__":
     model = SomeModel()
     print(model.predict("python python python"))
-    print(model.predict("p p p p p p p p p pyli"))
+    print(model.predict("p p p p p p p p p p"))
+    print(model.predict(" "))
+    print(model.predict("good"))
+    print(model.predict("bad"))
+    print(model.predict("neutral"))
