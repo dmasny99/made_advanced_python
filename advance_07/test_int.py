@@ -32,8 +32,10 @@ class TestInt(unittest.TestCase):
             }
         number_systems = [2, 3, 8, 16, 36]
         for num in numbers.items():
-            for idx, representation in enumerate(numbers[num]):
-                self.assertEqual(int(representation, number_systems[idx]), num)
+            for idx, representation in enumerate(numbers[num[0]]):
+                int_elem = int(representation, number_systems[idx])
+                self.assertIsInstance(int_elem, int)
+                self.assertEqual(int_elem, num[0])
 
 
 if __name__ == "__main__":
