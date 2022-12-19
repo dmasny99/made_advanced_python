@@ -43,7 +43,7 @@ def test_synt_model_load(get_synt_model):
     assert isinstance(get_synt_model, dict)
     assert get_synt_model["Model loaded"] is True
     with pytest.raises(KeyError):
-        get_synt_model.get("invalid key")
+        get_synt_model["invalid key"] == 0
 
 
 @pytest.mark.parametrize(
