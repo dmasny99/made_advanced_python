@@ -72,6 +72,18 @@ class TestStrPartition(unittest.TestCase):
             result = elem.partition(separators[idx])
             self.assertTupleEqual(result, results[idx])
 
+    def test_whose_string_partition(self):
+        strings = ["_abc_./abc_", " abc .,. abc ", "  .'kk'abc.abc."]
+        separators = strings
+        results = [
+            ("", separators[0], ""),
+            ("", separators[1], ""),
+            ("", separators[2], ""),
+            ]
+        for idx, elem in enumerate(strings):
+            result = elem.partition(separators[idx])
+            self.assertTupleEqual(result, results[idx])
+
 
 if __name__ == "__main__":
     unittest.main()
