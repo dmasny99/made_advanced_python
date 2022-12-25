@@ -8,6 +8,7 @@ def predict_message_mood(
     good_thresholds=0.8,
 ):
     logit = model.predict(message)
+    print(logit)
     if logit <= bad_thresholds:
         return "неуд"
     if logit > good_thresholds:

@@ -1,63 +1,70 @@
-import pytest
-from unittest import mock
+import unittest
+from unittest.mock import patch, call
 from predict_mood import predict_message_mood
-from some_model import SomeModel
 
 
-# at fisrt test real model
-@pytest.fixture
-def get_model():
-    model = SomeModel()
-    return model
+class TestSomeModel(unittest.TestCase):
+
+    def setUp(self):
+        print("Imitates that model is loaded")
+
+    def test_model_pred(self):
+        with patch("predict_mood.SomeModel") as mocked_model:
+            texts = [
+                "threat death",
+                "python python python",
+                "good love kind",
+                "hate kill pain",
+                "  ",
+                "friend friendship",
+                "Чапаев и пустота",
+                ]
+            scores = [0.28, 0.5, 1, 0.1, 0.32, 0.84, 0.81]
+            results = ["неуд", "норм", "отл", "неуд", "норм", "отл", "отл"]
+            mocked_model.predict.side_effect = scores
+            for idx, text in enumerate(texts):
+                self.assertEqual(
+                    predict_message_mood(text, mocked_model),
+                    results[idx])
+
+    def test_model_calls(self):
+        with patch("predict_mood.SomeModel") as mocked_model:
+            texts = [
+                "threat death",
+                "python python python",
+                "good love kind",
+                "hate kill pain",
+                "  ",
+                "friend friendship",
+                "Чапаев и пустота",
+                ]
+            scores = [0.28, 0.5, 1, 0.1, 0.32, 0.84, 0.81]
+            mocked_model.predict.side_effect = scores
+            for _, text in enumerate(texts):
+                predict_message_mood(text, mocked_model)
+                self.assertEqual(
+                    mocked_model.predict.call_args,
+                    call(text))
+
+    def test_border_scores(self):
+        eps = 0.001
+        with patch("predict_mood.SomeModel") as mocked_model:
+            texts = [
+                "txt 1",
+                "txt 2",
+                "txt 3",
+                "txt 4",
+                "txt 5",
+                "txt 6",
+                ]
+            scores = [0.3 + eps, 0.3 - eps, 0.8 - eps, 0.8, 0.8 + eps, 1]
+            results = ["норм", "неуд", "норм", "норм", "отл", "отл"]
+            mocked_model.predict.side_effect = scores
+            for idx, text in enumerate(texts):
+                self.assertEqual(
+                    predict_message_mood(text, mocked_model),
+                    results[idx])
 
 
-def test_model_load(get_model):
-    assert isinstance(get_model, SomeModel)
-    assert "predict" in dir(get_model)
-    with pytest.raises(AttributeError):
-        get_model.train()
-
-
-@pytest.mark.parametrize(
-    "message, expected",
-    [
-        ("python python python", "отл"),
-        ("p p p p p p p p p p", "неуд"),
-        (" ", "отл"),
-        ("good", "норм"),
-        ("bad", "норм"),
-        ("neutral", "отл")
-    ],
-)
-def test_predict_message_mood(get_model, message, expected):
-    assert predict_message_mood(message, get_model) == expected
-
-
-# then test model with mocks
-@pytest.fixture
-def get_synt_model():
-    return {"Model loaded": True}
-
-
-def test_synt_model_load(get_synt_model):
-    assert isinstance(get_synt_model, dict)
-    assert get_synt_model["Model loaded"] is True
-    with pytest.raises(KeyError):
-        get_synt_model["invalid key"] == 0
-
-
-@pytest.mark.parametrize(
-    "message, expected",
-    [
-        ("python python python", "отл"),
-        ("p p p p p p p p p p", "неуд"),
-        (" ", "отл"),
-        ("good", "норм"),
-        ("bad", "норм"),
-        ("neutral", "отл")
-    ],
-)
-def test_synt_pred(message, expected):
-    with mock.patch("predict_mood.SomeModel.predict") as mpred:
-        mpred.return_value = expected
-        assert mpred(message) == expected
+if __name__ == "__main__":
+    unittest.main()
