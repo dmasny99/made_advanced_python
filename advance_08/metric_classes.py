@@ -116,17 +116,17 @@ class Stats:
 
     def collect(self) -> dict:
         result = {}
-        for (namespace, method_name) in zip([self.timer_buff,
+        for (stat_buff, method_name) in zip([self.timer_buff,
                                              self.avg_buff,
                                              self.cnt_buff],
                                             ["timer", "avg", "count"]):
-            assert isinstance(namespace, dict)  # for mypy purposes
-            for name, class_struct in namespace.items():
-                value = class_struct.get_value()
+            assert isinstance(stat_buff, dict)  # for mypy purposes
+            for name, class_metric in stat_buff.items():
+                value = class_metric.get_value()
                 if value == 0:
                     continue
                 result[f"{name}.{method_name}"] = value
-                class_struct.clear()
+                class_metric.clear()
         return result
 
 

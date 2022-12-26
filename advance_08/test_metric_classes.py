@@ -1,80 +1,90 @@
 import unittest
-from time import time, sleep
+import time
 
 from metric_classes import Stats
 
 
-class StatsTest(unittest.TestCase):
-    def test_time_module(self):
-        def wait_func(delay):
-            sleep(delay)
+class TestStats(unittest.TestCase):
 
-        with Stats.timer("calc"):  # 0.2
-            wait_func(0.2)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.singleton = Stats()
 
-        res_time = Stats.collect()['calc.timer']
-        self.assertAlmostEqual(res_time, 0.2, delta=0.01)
-        self.assertDictEqual(Stats.collect(), {})
+    def test_is_singleton(self):
+        stat = Stats()
+        stat2 = Stats()
+        stat3 = Stats()
+        self.assertEqual(id(self.singleton), id(stat))
+        self.assertEqual(id(stat), id(stat2))
+        self.assertEqual(id(stat2), id(stat3))
+        self.assertEqual(id(stat), id(stat3))
+        self.assertEqual(id(self.singleton), id(stat3))
 
-        with Stats.timer("calc"):  # 0.5
-            wait_func(0.2)
-            wait_func(0.3)
+    def test_time_stats(self):
+        def __sleeper(time_sleep):
+            time.sleep(time_sleep)
 
-        res_time = Stats.collect()['calc.timer']
-        self.assertAlmostEqual(res_time, 0.5, delta=0.01)
-        self.assertDictEqual(Stats.collect(), {})
+        with self.singleton.timer("sleeper"):
+            __sleeper(0.5)
 
-        t1 = time()
-        wait_func(0.7)  # 7
-        t2 = time()
-        Stats.timer("calc").add(t2 - t1)  # 0.7
+        time_stats = self.singleton.collect()["sleeper.timer"]
+        self.assertAlmostEqual(time_stats, 0.5, delta=0.01)
 
-        res_time = Stats.collect()['calc.timer']
-        self.assertAlmostEqual(res_time, 0.7, delta=0.01)
-        self.assertDictEqual(Stats.collect(), {})
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["sleeper.timer"]
 
-        t1 = time()
-        wait_func(0.5)  # 7
-        t2 = time()
-        Stats.timer("calc").add(t2 - t1)  # 0.5
-        Stats.timer("calc").add(t2 - t1)  # 1
+        with self.singleton.timer("sleeper"):
+            __sleeper(0.5)
+            __sleeper(0.5)
 
-        res_time = Stats.collect()['calc.timer']
-        self.assertAlmostEqual(res_time, 1, delta=0.01)
-        self.assertDictEqual(Stats.collect(), {})
+        time_stats = self.singleton.collect()["sleeper.timer"]
+        self.assertAlmostEqual(time_stats, 1, delta=0.02)
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["sleeper.timer"]
 
-    def test_avg_module(self):
-        Stats.avg("calc").add(1)
-        res_avg = Stats.collect()['calc.avg']
-        self.assertEqual(res_avg, 1)
+        start_time = time.time()
+        __sleeper(0.5)
+        self.singleton.timer("sleeper").add(time.time() - start_time)
+        time_stats = self.singleton.collect()["sleeper.timer"]
+        self.assertAlmostEqual(time_stats, 0.5, delta=0.02)
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["sleeper.timer"]
 
-        Stats.avg("calc").add(1)
-        Stats.avg("calc").add(9)
-        Stats.avg("calc").add(4)
-        Stats.avg("calc").add(6)
-        res_avg = Stats.collect()['calc.avg']
-        self.assertEqual(res_avg, 5)
+        start_time = time.time()
+        __sleeper(0.5)
+        self.singleton.timer("sleeper").add(time.time() - start_time)
+        self.singleton.timer("sleeper").add(time.time() - start_time)
+        time_stats = self.singleton.collect()["sleeper.timer"]
+        self.assertAlmostEqual(time_stats, 1, delta=0.02)
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["sleeper.timer"]
 
-        self.assertDictEqual(Stats.collect(), {})
+    def test_counter_stat(self):
+        self.singleton.count("foo").add()
+        self.assertEqual(self.singleton.collect()["foo.count"], 1)
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["foo.count"]
 
-    def test_count_module(self):
-        Stats.count("calc").add()
-        res_avg = Stats.collect()['calc.count']
-        self.assertEqual(res_avg, 1)
+        self.singleton.count("foo").add()
+        self.singleton.count("foo").add()
+        self.singleton.count("foo").add()
+        self.singleton.count("foo").add()
+        self.singleton.count("foo").add()
+        self.assertEqual(self.singleton.collect()["foo.count"], 5)
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["foo.count"]
 
-        Stats.count("calc").add()
-        Stats.count("calc").add()
-        Stats.count("calc").add()
-        Stats.count("calc").add()
-        res_avg = Stats.collect()['calc.count']
-        self.assertEqual(res_avg, 4)
+    def test_avg_stat(self):
+        self.singleton.avg("foo").add(1)
+        self.assertEqual(self.singleton.collect()["foo.avg"], 1)
 
-        self.assertDictEqual(Stats.collect(), {})
+        self.singleton.avg("foo").add(1)
+        self.singleton.avg("foo").add(2)
+        self.singleton.avg("foo").add(3)
+        self.assertEqual(self.singleton.collect()["foo.avg"], 2)
 
-    def test_empty(self):
-        Stats.count("calc")
-        Stats.count("empty")
-        self.assertDictEqual(Stats.collect(), {})
+        with self.assertRaises(KeyError):
+            _ = self.singleton.collect()["foo.avg"]
 
 
 if __name__ == '__main__':
